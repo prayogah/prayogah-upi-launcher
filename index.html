@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#4c2c3b"><title>Prayogah · Open payment app</title>
 <style>*{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#faf6ef;color:#30252b;margin:0;padding:16px}.card{max-width:480px;margin:22px auto;background:#fff;border-radius:18px;padding:24px;box-shadow:0 8px 30px #35213b12}h1{font:normal 26px Georgia,serif;color:#4c2c3b;margin:0 0 8px}.sub,.muted{color:#70656b;font-size:14px;line-height:1.5}.details{background:#fff7ed;padding:16px;border-radius:12px;margin:16px 0}.label{font-size:12px;color:#756970;margin:12px 0 4px}.value{font-weight:700;overflow-wrap:anywhere}.amount{font-size:30px}.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px;margin:11px 0;background:#59364a;color:white;font:600 16px system-ui;text-align:center;text-decoration:none;cursor:pointer}.secondary{background:#f0e8e5;color:#4c2c3b}.notice{background:#fff1db;border-radius:12px;padding:12px;font-size:13px;line-height:1.5}.status{min-height:22px;font-size:13px;color:#4c2c3b}</style></head>
-<body><main class="card"><h1>Prayogah School of Dance</h1><p class="sub">Copy the UPI ID, then open your payment app. Enter the amount shown below manually.</p><div class="details"><div class="label">Pay to UPI ID</div><div class="value" id="payee">9535409637@axl</div><div class="label">Amount to enter</div><div class="value amount" id="amount">—</div><div class="label">Payment note (for reference)</div><div class="value" id="note">Prayogah Fees</div></div><button type="button" class="btn secondary" id="copy">Copy UPI ID</button><a class="btn" id="phonepe" href="phonepe://" rel="noopener">Copy ID &amp; Open PhonePe</a><a class="btn" id="gpay" href="gpay://" rel="noopener">Copy ID &amp; Open Google Pay</a><p id="status" class="status" role="status" aria-live="polite"></p><p class="notice">The payment app may open on its home screen. Paste the copied UPI ID in its UPI ID payment option, enter the amount, and verify the recipient. App-only links cannot reliably preselect the payee, amount, or note.</p><p class="muted">If an app does not open, launch it manually. Return to the Parent Portal after payment to submit your transaction reference. This page does not process or confirm payments.</p></main>
+<body><main class="card"><h1>Prayogah School of Dance</h1><p class="sub">Copy the UPI ID, then tap the payment app button. Enter the amount shown below manually.</p><div class="details"><div class="label">Pay to UPI ID</div><div class="value" id="payee">9535409637@axl</div><div class="label">Amount to enter</div><div class="value amount" id="amount">—</div><div class="label">Payment note (for reference)</div><div class="value" id="note">Prayogah Fees</div></div><button type="button" class="btn secondary" id="copy">Copy UPI ID</button><a class="btn" id="phonepe" href="phonepe://" rel="noopener">Open PhonePe</a><a class="btn" id="gpay" href="gpay://" rel="noopener">Open Google Pay</a><p id="status" class="status" role="status" aria-live="polite"></p><p class="notice">The payment app may open on its home screen. Paste the copied UPI ID in its UPI ID payment option, enter the amount, and verify the recipient. App-only links cannot reliably preselect the payee, amount, or note.</p><p class="muted">If an app does not open, launch it manually. Return to the Parent Portal after payment to submit your transaction reference. This page does not process or confirm payments.</p></main>
 <script>
 (()=>{
   const upiId='9535409637@axl';
@@ -16,11 +16,13 @@
     catch(e){status.textContent='Could not copy automatically. Please copy 9535409637@axl manually.';return false;}
   }
   document.getElementById('copy').addEventListener('click',copy);
-  // No UPI payment URI: avoids the previously rejected browser-initiated payment request.
-  // Direct, user-tapped app-only schemes are best-effort; no foreground guarantee.
-  for(const id of ['phonepe','gpay']){
-    document.getElementById(id).addEventListener('click',()=>{void copy();});
+  // Android: direct user-tapped Chrome intent links; no payment request.
+  // iOS: retain native schemes. These cannot guarantee foreground launch.
+  if(/Android/i.test(navigator.userAgent)){
+    document.getElementById('phonepe').href='intent://#Intent;scheme=phonepe;package=com.phonepe.app;end';
+    document.getElementById('gpay').href='intent://#Intent;scheme=gpay;package=com.google.android.apps.nbu.paisa.user;end';
   }
+  status.textContent='Tap Copy UPI ID first, then tap your payment app. If the app stays in the background, switch to it from recent apps.';
   const chosen=q.get('app');
   if(chosen==='phonepe'||chosen==='gpay')document.getElementById(chosen).style.outline='3px solid #d8aa62';
 })();
